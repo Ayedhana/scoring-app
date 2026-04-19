@@ -1,9 +1,12 @@
 import api from '@/services/api'
 
+const BASE_URL = '/v1'
+
 export const clientService = {
-  // Get all clients with pagination
+
+  // Get all clients
   getClients(page = 1, perPage = 15) {
-    return api.get('/clients', {
+    return api.get(`${BASE_URL}/clients`, {
       params: {
         page,
         per_page: perPage
@@ -11,37 +14,37 @@ export const clientService = {
     })
   },
 
-  // Get single client details
+  // Get single client
   getClient(clientId) {
-    return api.get(`/clients/${clientId}`)
+    return api.get(`${BASE_URL}/clients/${clientId}`)
   },
 
   // Get client scores history
   getClientScoresHistory(clientId) {
-    return api.get(`/clients/${clientId}/scores`)
+    return api.get(`${BASE_URL}/clients/${clientId}/scores`)
   },
 
-  // Sync client data from T24
+  // Sync from T24
   syncFromT24(clientId) {
-    return api.post(`/clients/${clientId}/sync`)
+    return api.post(`${BASE_URL}/clients/${clientId}/sync`)
   }
 }
 
 export const scoreService = {
-  // Get all scores
+
   getScores(page = 1) {
-    return api.get('/scores', {
+    return api.get(`${BASE_URL}/scores`, {
       params: { page }
     })
   },
 
-  // Get specific score
   getScore(scoreId) {
-    return api.get(`/scores/${scoreId}`)
+    return api.get(`${BASE_URL}/scores/${scoreId}`)
   },
 
-  // Calculate new score
   calculateScore(data) {
-    return api.post('/scores/calculate', data)
-  }
+  return api.post(`${BASE_URL}/scores/calculate`, {
+    client_id: String(data.client_id || data)
+  })
 }
+  }

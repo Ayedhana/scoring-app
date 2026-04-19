@@ -97,6 +97,8 @@
             <th>Email</th>
             <th>Revenu Mensuel</th>
             <th>Statut</th>
+            <th>Score</th>
+            <th>Décision</th>
             <th class="center">Action</th>
           </tr>
         </thead>
@@ -124,6 +126,15 @@
                 {{ client.status === 'active' ? 'Actif' : 'Inactif' }}
               </span>
             </td>
+            <td>
+           {{ calculateScore(client) }}
+          </td>
+
+          <td>
+          <span :class="['status-badge', getStatus(calculateScore(client)).class]">
+          {{ getStatus(calculateScore(client)).label }}
+          </span>
+          </td>
             <td class="center">
               <button class="btn-score" @click="goToDetails(client)">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -219,6 +230,37 @@ async function handleLogout() {
 onMounted(() => {
   fetchClients()
 })
+function calculateScore(client) {
+  let score = 0
+
+  if (client.solde_moyen >= 50000) score += 300
+  else if (client.solde_moyen >= 20000) score += 210
+  else if (client.solde_moyen >= 5000) score += 130
+  else score += 60
+
+  if (client.anciennete_mois >= 60) score += 300
+  else if (client.anciennete_mois >= 36) score += 220
+  else if (client.anciennete_mois >= 12) score += 150
+  else score += 70
+
+  if (client.nombre_incidents === 0) score += 300
+  else if (client.nombre_incidents <= 2) score += 180
+  else if (client.nombre_incidents <= 5) score += 90
+  else score += 30
+
+  if (client.montant_credits <= 10000) score += 300
+  else if (client.montant_credits <= 50000) score += 200
+  else if (client.montant_credits <= 100000) score += 120
+  else score += 50
+
+  return score
+}
+
+function getStatus(score) {
+  if (score >= 900) return { label: 'Accepté', class: 'status-active' }
+  if (score >= 600) return { label: 'Moyen', class: 'status-inactive' }
+  return { label: 'Refusé', class: 'status-inactive' }
+}
 </script>
 
 <style scoped>

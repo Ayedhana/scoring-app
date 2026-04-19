@@ -6,6 +6,8 @@ import ClientDetailsView from "@/views/ClientDetailsView.vue"
 import HistoriqueView from '../views/HistoriqueView.vue'
 import NotFoundView from "@/views/NotFoundView.vue"
 import { useAuth } from "@/composables/useAuth"
+import RapportsView from "@/views/RapportsView.vue"
+import ParametresView from "@/views/ParametresView.vue"
 
 
 
@@ -42,6 +44,16 @@ const routes = [
     component: HistoriqueView,
     meta: { requiresAuth: true }
   },
+  {
+  path: '/rapports',
+  component: RapportsView,
+  meta: { requiresAuth: true }
+},
+{
+  path: '/parametres',
+  component: ParametresView,
+  meta: { requiresAuth: true }
+},
   { 
     path: "/:pathMatch(.*)*", 
     name: "NotFound", 

@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('scores', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
-            $table->decimal('score_total', 5, 2)->default(0);
+            // ✅ Accepte jusqu'à 9999.99
+            $table->decimal('score_total', 7, 2);
             $table->enum('niveau_risque', ['faible', 'moyen', 'eleve'])->default('moyen');
             $table->json('detail_scores')->nullable();
             $table->foreignId('calculated_by')->constrained('users')->onDelete('cascade');

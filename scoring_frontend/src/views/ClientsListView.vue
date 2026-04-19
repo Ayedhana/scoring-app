@@ -86,7 +86,8 @@ const fetchClients = async () => {
   error.value = ''
   try {
     const response = await clientService.getClients()
-    clients.value = response.data.data || response.data
+    clients.value = response.data
+    console.log(response)
   } catch (err) {
     error.value = err.response?.data?.message || 'Failed to load clients'
     console.error('Error fetching clients:', err)

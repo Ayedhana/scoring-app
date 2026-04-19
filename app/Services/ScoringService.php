@@ -134,4 +134,24 @@ class ScoringService
 
         return 'eleve';
     }
+    public function calculateFromT24($client): array
+{
+    $accountAgePoints = $this->scoreAccountAge($client->anciennete_mois ?? 0);
+    $paymentIncidentPoints = $this->scorePaymentIncidents($client->nombre_incidents ?? 0);
+    $creditAmountPoints = $this->scoreCreditAmount($client->montant_credits ?? 0);
+    $avgBalancePoints = $this->scoreAverageBalance($client->solde_moyen ?? 0);
+
+    $total = $accountAgePoints + $paymentIncidentPoints + $creditAmountPoints + $avgBalancePoints;
+
+    return [
+        'score_total' => $total,
+        'niveau_risque' => $this->determineRiskLevel($total),
+        'details' => [
+            'account_age' => $accountAgePoints,
+            'payment_incidents' => $paymentIncidentPoints,
+            'credit_amount' => $creditAmountPoints,
+            'avg_balance' => $avgBalancePoints,
+        ]
+    ];
+}
 }

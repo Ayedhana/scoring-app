@@ -11,7 +11,7 @@ export function useAuth() {
     loading.value = true
     error.value = null
     try {
-      const response = await api.post('/login', { email, password })
+      const response = await api.post('/v1/login', { email, password })
       const { access_token, user: userData } = response.data
       
       localStorage.setItem('access_token', access_token)
@@ -33,7 +33,7 @@ export function useAuth() {
     loading.value = true
     error.value = null
     try {
-      const response = await api.post('/register', { name, email, password, password_confirmation })
+      const response = await api.post('/v1/register', { name, email, password, password_confirmation })
       const { access_token, user: userData } = response.data
 
       localStorage.setItem('access_token', access_token)
@@ -53,7 +53,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await api.post('/logout')
+      await api.post('/v1/logout')
     } catch (err) {
       console.error('Logout error:', err)
     } finally {

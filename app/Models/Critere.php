@@ -21,8 +21,8 @@ class Critere extends Model
 
     protected $casts = [
         'ponderation' => 'decimal:2',
-        'valeur_min'  => 'decimal:2',
-        'valeur_max'  => 'decimal:2',
-        'is_active'   => 'boolean',
+        'valeur_min' => 'decimal:2',
+        'valeur_max' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 }

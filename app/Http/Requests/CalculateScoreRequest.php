@@ -14,7 +14,7 @@ class CalculateScoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => 'required|integer|exists:clients,id',
+            'client_id'    => 'required|string',
             'use_live_data' => 'sometimes|boolean',
         ];
     }
