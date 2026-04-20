@@ -7,7 +7,10 @@ use App\Http\Controllers\Api\CompteController;
 use App\Http\Controllers\Api\ScoreController;
 use App\Http\Controllers\Api\RapportController;
 use App\Http\Controllers\Api\CritereController;
+use App\Http\Controllers\Api\UserController;
+
 Route::prefix('v1')->group(function () {
+
 
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
@@ -21,6 +24,11 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api'])->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
+        Route::get('users', [UserController::class, 'index']);
+        Route::post('users', [UserController::class, 'store']);
+        Route::put('users/{user}', [UserController::class, 'update']);
+        Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus']);
+        Route::delete('users/{user}', [UserController::class, 'destroy']);
         
         // Critères — accessibles par admin seulement
        Route::get('criteres', [CritereController::class, 'index']);

@@ -60,3 +60,22 @@ a,
   --btn-hover: #12737b;
   --shadow: rgba(0, 0, 0, 0.4);
 }
+.modal-overlay {
+  position: fixed !important;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999 !important;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  width: 460px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  z-index: 100000 !important;
+  position: relative;
+}

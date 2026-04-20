@@ -5,17 +5,10 @@ import RegisterView from "@/views/RegisterView.vue"
 import ClientDetailsView from "@/views/ClientDetailsView.vue"
 import HistoriqueView from '../views/HistoriqueView.vue'
 import NotFoundView from "@/views/NotFoundView.vue"
-import { useAuth } from "@/composables/useAuth"
 import RapportsView from "@/views/RapportsView.vue"
 import ParametresView from "@/views/ParametresView.vue"
-
-
-
-
-
-
-
-
+import UsersView from "@/views/UsersView.vue"
+import { useAuth } from "@/composables/useAuth"
 
 const routes = [
   {
@@ -45,15 +38,20 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-  path: '/rapports',
-  component: RapportsView,
-  meta: { requiresAuth: true }
-},
-{
-  path: '/parametres',
-  component: ParametresView,
-  meta: { requiresAuth: true }
-},
+    path: '/rapports',
+    component: RapportsView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/parametres',
+    component: ParametresView,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/users',
+    component: UsersView,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
   { 
     path: "/:pathMatch(.*)*", 
     name: "NotFound", 
@@ -61,25 +59,33 @@ const routes = [
   },
 ]
 
-
-
 const router = createRouter({
   history: createWebHistory(),
   routes,
 })
 
-// Navigation guard for authentication
+// ✅ Navigation guard avec vérification des rôles
 router.beforeEach((to, from, next) => {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const requiresAuth = to.meta.requiresAuth !== false
+  const requiresAdmin = to.meta.requiresAdmin === true
 
+  // Non connecté → login
   if (requiresAuth && !isAuthenticated.value) {
-    next('/login')
-  } else if (to.path === '/login' && isAuthenticated.value) {
-    next('/')
-  } else {
-    next()
+    return next('/login')
   }
+
+  // Connecté sur login → dashboard
+  if (to.path === '/login' && isAuthenticated.value) {
+    return next('/')
+  }
+
+  // Page admin → vérifier le rôle
+  if (requiresAdmin && user.value?.role !== 'admin') {
+    return next('/')
+  }
+
+  next()
 })
 
-export default router 
+export default router
