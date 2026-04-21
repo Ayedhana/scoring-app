@@ -203,7 +203,8 @@ function logout() {
   display: flex;
   min-height: 100vh;
   background: #f0f3f8;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  position: relative;
+  overflow: visible; /* ← ajoute ça */
 }
 
 /* ─── Sidebar ─────────────────────────────────────────────── */
@@ -432,5 +433,11 @@ function logout() {
   min-height: 100vh;
   background: #f0f3f8;
   position: relative; /* ✅ important */
+}
+.page-content {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;  /* ← garde ça */
+  overflow-x: visible; /* ← ajoute ça */
 }
 </style>

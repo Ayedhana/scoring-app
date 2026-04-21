@@ -1,132 +1,133 @@
 <template>
-
-<div>
-  <AppLayout>
-    <div class="page-top">
-      <div>
-        <h1 class="page-title">Gestion des Utilisateurs</h1>
-        <p class="page-sub">{{ users.length }} utilisateur(s)</p>
-      </div>
-      <button class="btn-add" type="button" @click="openModal(null)">
-        + Nouvel Utilisateur
-      </button>
-    </div>
-
-    <div v-if="loading" class="loading">Chargement...</div>
-    <div v-else-if="error" class="error-msg">{{ error }}</div>
-
-    <div v-else class="table-card">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nom</th>
-            <th>Email</th>
-            <th>Rôle</th>
-            <th>Statut</th>
-            <th>Créé le</th>
-            <th class="center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(user, index) in users" :key="user.id" class="user-row">
-            <td class="col-num">{{ index + 1 }}</td>
-            <td class="col-name">
-              <div class="user-cell">
-                <div class="avatar">{{ user.name.charAt(0).toUpperCase() }}</div>
-                <span>{{ user.name }}</span>
-              </div>
-            </td>
-            <td class="col-email">{{ user.email }}</td>
-            <td>
-              <span :class="['role-badge', getRoleClass(user.role)]">
-                {{ formatRole(user.role) }}
-              </span>
-            </td>
-            <td>
-              <span :class="['status-badge', user.is_active ? 'status-active' : 'status-inactive']">
-                <span class="status-dot"></span>
-                {{ user.is_active ? 'Actif' : 'Inactif' }}
-              </span>
-            </td>
-            <td class="col-date">{{ formatDate(user.created_at) }}</td>
-            <td class="center">
-              <div class="actions">
-                <button class="btn-edit" type="button" @click="openModal(user)">✏️</button>
-                <button
-                  type="button"
-                  :class="user.is_active ? 'btn-deactivate' : 'btn-activate'"
-                  @click="toggleStatus(user)"
-                >
-                  {{ user.is_active ? '🔒' : '🔓' }}
-                </button>
-                <button class="btn-delete" type="button" @click="confirmDelete(user)">🗑️</button>
-              </div>
-            </td>
-          </tr>
-
-          <tr v-if="users.length === 0">
-            <td colspan="7" class="empty-row">
-              <div class="empty-state">
-                <p>Aucun utilisateur trouvé</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </AppLayout>
-
-  <!-- ✅ Teleport EN DEHORS de AppLayout -->
   <div>
-    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
-      <div class="modal">
-        <h2>{{ editingUser ? 'Modifier Utilisateur' : 'Nouvel Utilisateur' }}</h2>
-
-        <div class="form-group">
-          <label>Nom</label>
-          <input v-model="form.name" type="text" placeholder="Nom complet" />
+    <AppLayout>
+      <div class="page-top">
+        <div>
+          <h1 class="page-title">Gestion des Utilisateurs</h1>
+          <p class="page-sub">{{ users?.length ?? 0 }} utilisateur(s)</p>
         </div>
+       <button class="btn-add" @click="router.push('/users/create')">
+  + Nouvel Utilisateur
+</button>
+      </div>
 
-        <div class="form-group">
-          <label>Email</label>
-          <input v-model="form.email" type="email" placeholder="email@exemple.com" />
-        </div>
+      <div v-if="loading" class="loading">Chargement...</div>
+      <div v-else-if="error" class="error-msg">{{ error }}</div>
 
-        <div class="form-group">
-          <label>{{ editingUser ? 'Nouveau mot de passe (optionnel)' : 'Mot de passe' }}</label>
-          <input v-model="form.password" type="password" placeholder="••••••••" />
-        </div>
+      <div v-else class="table-card">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Statut</th>
+              <th>Créé le</th>
+              <th class="center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(user, index) in users" :key="user.id" class="user-row">
+              <td class="col-num">{{ index + 1 }}</td>
+              <td class="col-name">
+                <div class="user-cell">
+                  <div class="avatar">{{ user.name?.charAt(0).toUpperCase() }}</div>
+                  <span>{{ user.name }}</span>
+                </div>
+              </td>
+              <td class="col-email">{{ user.email }}</td>
+              <td>
+                <span :class="['role-badge', getRoleClass(user.role)]">
+                  {{ formatRole(user.role) }}
+                </span>
+              </td>
+              <td>
+                <span :class="['status-badge', user.is_active ? 'status-active' : 'status-inactive']">
+                  <span class="status-dot"></span>
+                  {{ user.is_active ? 'Actif' : 'Inactif' }}
+                </span>
+              </td>
+              <td class="col-date">{{ formatDate(user.created_at) }}</td>
+              <td class="center">
+                <div class="actions">
+                 <button class="btn-edit" @click="goToEdit(user)">✏️</button>
+                  <button
+                    type="button"
+                    :class="user.is_active ? 'btn-deactivate' : 'btn-activate'"
+                    @click="toggleStatus(user)"
+                  >
+                    {{ user.is_active ? '🔒' : '🔓' }}
+                  </button>
+                  <button class="btn-delete" type="button" @click="confirmDelete(user)">🗑️</button>
+                </div>
+              </td>
+            </tr>
 
-        <div class="form-group">
-          <label>Rôle</label>
-          <select v-model="form.role">
-            <option value="admin">Administrateur</option>
-            <option value="analyst">Analyste Crédit</option>
-            <option value="auditor">Auditeur</option>
-          </select>
-        </div>
+            <tr v-if="!users || users.length === 0">
+              <td colspan="7" class="empty-row">
+                <div class="empty-state">
+                  <p>Aucun utilisateur trouvé</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </AppLayout>
 
-        <div v-if="formError" class="form-error">{{ formError }}</div>
+    <Teleport to="body">
+      <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+        <div class="modal">
+          <h2>{{ editingUser ? 'Modifier Utilisateur' : 'Nouvel Utilisateur' }}</h2>
 
-        <div class="modal-actions">
-          <button class="btn-cancel" type="button" @click="closeModal">Annuler</button>
-          <button class="btn-save" type="button" @click="saveUser" :disabled="saving">
-            {{ saving ? 'Sauvegarde...' : 'Sauvegarder' }}
-          </button>
+          <div class="form-group">
+            <label>Nom</label>
+            <input v-model="form.name" type="text" placeholder="Nom complet" />
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input v-model="form.email" type="email" placeholder="email@exemple.com" />
+          </div>
+
+          <div class="form-group">
+            <label>{{ editingUser ? 'Nouveau mot de passe (optionnel)' : 'Mot de passe' }}</label>
+            <input v-model="form.password" type="password" placeholder="••••••••" />
+          </div>
+
+          <div class="form-group">
+            <label>Rôle</label>
+            <select v-model="form.role">
+              <option value="admin">Administrateur</option>
+              <option value="analyst">Analyste Crédit</option>
+              <option value="auditor">Auditeur</option>
+            </select>
+          </div>
+
+          <div v-if="formError" class="form-error">{{ formError }}</div>
+
+          <div class="modal-actions">
+            <button class="btn-cancel" type="button" @click="closeModal">Annuler</button>
+            <button class="btn-save" type="button" @click="saveUser" :disabled="saving">
+              {{ saving ? 'Sauvegarde...' : 'Sauvegarder' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
+
   </div>
-</div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
 import { userService } from '@/services/userService'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
+// ✅ Initialisé avec un tableau vide
 const users = ref([])
 const loading = ref(false)
 const error = ref('')
@@ -146,32 +147,22 @@ onMounted(() => fetchUsers())
 
 async function fetchUsers() {
   loading.value = true
+  error.value = ''
   try {
     const res = await userService.getUsers()
-    users.value = res.data
+    // ✅ Assure-toi que c'est toujours un tableau
+    users.value = Array.isArray(res.data) ? res.data : (res.data?.data || [])
   } catch (err) {
     error.value = 'Erreur lors du chargement des utilisateurs'
+    users.value = []
+    console.error(err)
   } finally {
     loading.value = false
   }
 }
 
-function openModal(user = null) {
-console.log("CLICK OK")
-  showModal.value = true
-  editingUser.value = user
-  formError.value = ''
-  if (user) {
-    form.value = {
-      name: user.name,
-      email: user.email,
-      password: '',
-      role: user.role
-    }
-  } else {
-    form.value = { name: '', email: '', password: '', role: 'analyst' }
-  }
-  showModal.value = true
+function goToEdit(user) {
+  router.push(`/users/${user.id}/edit`)
 }
 
 function closeModal() {
@@ -354,93 +345,10 @@ function formatDate(dateStr) {
 .btn-activate   { background: #dcfce7; }
 .btn-delete     { background: #fee2e2; }
 
-/* ✅ Modal styles globaux */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.modal {
-  background: white;
-  border-radius: 12px;
-  padding: 28px;
-  width: 460px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-}
-
-.modal h2 { color: #0f4f4f; margin: 0 0 20px; font-size: 18px; }
-
-.form-group { margin-bottom: 16px; }
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 6px;
-}
-.form-group input, .form-group select {
-  width: 100%;
-  padding: 9px 12px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 13px;
-  color: #374151;
-  outline: none;
-  box-sizing: border-box;
-}
-.form-group input:focus, .form-group select:focus { border-color: #0d9488; }
-
-.form-error { color: #b91c1c; font-size: 13px; margin-bottom: 12px; }
-
-.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-.btn-cancel {
-  padding: 9px 18px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 8px;
-  background: white;
-  color: #374151;
-  cursor: pointer;
-  font-size: 13px;
-}
-.btn-save {
-  padding: 9px 18px;
-  background: #0f4f4f;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-}
 .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .loading { text-align: center; padding: 40px; color: #94a3b8; }
 .error-msg { background: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 8px; }
 .empty-row { padding: 0 !important; }
 .empty-state { display: flex; justify-content: center; padding: 40px; color: #94a3b8; }
-body {
-  overflow: auto !important;
-}
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99999; /* 🔥 augmente */
-}
-.modal {
-  position: relative;
-  z-index: 1000000;
-  border: 5px solid red;
-}
 </style>
